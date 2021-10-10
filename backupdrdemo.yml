@@ -1,0 +1,12 @@
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  namespace: openshift-adp
+  name: backupdrdemo
+spec:
+  includedNamespaces:
+    - drdemo
+  excludedResources:
+    - imagetags.image.openshift.io
+  snapshotVolumes: false
+
