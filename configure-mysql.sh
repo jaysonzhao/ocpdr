@@ -16,7 +16,7 @@ mysqld_safe --skip-grant-tables --skip-networking --log-error=/tmp/mariadb.log &
 mysql=(mysql -u root)
 #mysql=( mysql --protocol=socket -uroot -hlocalhost --socket=/var/run/mysql/mysql-init.sock )
 sleep 15
- echo "CREATE DATABASE IF NOT EXISTS \`$MYSQL_DATABASE\` ;" | "${mysql[@]}"
+echo "CREATE DATABASE IF NOT EXISTS mysql;" | "${mysql[@]}"
 mysql_upgrade -u root
 kill -9 `cat /run/rh-mariadb105-mariadb/mariadb.pid`
 mysqld_safe --skip-grant-tables --skip-networking --log-error=/tmp/mariadb.log &
