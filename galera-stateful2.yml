@@ -41,6 +41,11 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.namespace
+            - name: PEER_DNS_IP
+              valueFrom:
+                secretKeyRef:
+                  name: rails-mysql-persistent
+                  key: peer_dns_ip
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:

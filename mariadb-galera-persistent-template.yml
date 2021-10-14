@@ -136,6 +136,10 @@ parameters:
 - description: The custom RubyGems mirror URL
   displayName: Custom RubyGems Mirror URL
   name: RUBYGEM_MIRROR
+- description: Peer DNS Ipaddr on Submariner
+  displayName: Peer DNS IP on Submariner
+  name: PEER_DNS_IP
+  value: "172.30.0.10"
 
 objects:
 - apiVersion: v1
@@ -149,6 +153,7 @@ objects:
     database-user: ${DATABASE_USER}
     database-user-password: ${DATABASE_USER_PASSWORD}
     keybase: ${SECRET_KEY_BASE}
+    peer_dns_ip: ${PEER_DNS_IP}
 
 - apiVersion: v1
   kind: Service
