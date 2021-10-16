@@ -1,0 +1,23 @@
+apiVersion: oadp.openshift.io/v1alpha1
+kind: Velero
+metadata:
+  name: oadp-velero
+  namespace: openshift-adp
+spec:
+  olm_managed: true
+  backupStorageLocations:
+  - provider: aws
+    default: true
+    objectStorage:
+      bucket: oadp-haoting
+      prefix: velero
+    credential:
+      name: cloud-credentials
+      key: cloud
+    config:
+      region: ap-southeast-1
+      profile: "default"  
+  default_velero_plugins:
+    - aws
+    - openshift
+  enable_restic: false

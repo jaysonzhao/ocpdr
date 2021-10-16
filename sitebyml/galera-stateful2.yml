@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rails-mysql-persistent
+stringData:
+  application-password: redhat
+  application-user: admin
+  database-password: redhat
+  database-user: admin
+  database-user-password: redhat
+  keybase: uwao2do83qv4uj5yv53y2rqjqi6pn0kxy4u4u4xoiiuopgvw51ru4nqwd8ifrr76filyxf4216624fgk4ltvl6dcwxpg2angm0l0l618rdlpmb65554aocoinlnxdbi
+  peer_dns_ip: ""
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: galera-stateful
+  labels:
+    app: galera-stateful
+spec:
+  ports:
+  - port: 3306
+    name: mysql
+  clusterIP: None
+  selector:
+    app: galera-stateful
+
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: galera-stateful  
+    
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: galera-stateful
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: galera-stateful
+    spec:
+      containers:
+        - resources:
+            limits:
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          name: mariadb-galera
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: PEER_DNS_IP
+              valueFrom:
+                secretKeyRef:
+                  name: rails-mysql-persistent
+                  key: peer_dns_ip
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rails-mysql-persistent
+                  key: database-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rails-mysql-persistent
+                  key: database-user-password
+            - name: MYSQL_DATABASE
+              value: 'demodb'
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rails-mysql-persistent
+                  key: database-password
+            - name: GALERA_PETSET_NAME
+              value: mariadb-galera
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+            - name: sst
+              containerPort: 4444
+              protocol: TCP
+            - name: replication
+              containerPort: 4567
+              protocol: TCP
+            - name: ist
+              containerPort: 4568
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: galera-stateful
+              mountPath: /var/lib/mysql
+              subPath: data
+          terminationMessagePolicy: File
+          image: quay.io/tonyli71/mariadb-galera:latest
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  volumeClaimTemplates:
+    - kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: galera-stateful
+        creationTimestamp: null
+        labels:
+          app: mariadb
+          cp.cna.at/instance: workshop
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Mi
+        storageClassName: ocs-storagecluster-ceph-mirror
+        volumeMode: Filesystem
+      
+  serviceName: galera-stateful
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
+
