@@ -261,7 +261,7 @@ objects:
                   name: ${NAME}            
             - name: GALERA_PETSET_NAME
               value: "${GALERA_PETSET_NAME}"
-          image: 'quay.io/tonyli71/mariadb-galera:latest'
+          image: 'quay.io/jaysonzhao/galeramariadb:latest'
           imagePullPolicy: Always
           triggers:
           - imageChangeParams:
