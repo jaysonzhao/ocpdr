@@ -136,6 +136,10 @@ parameters:
   displayName: Peer DNS IP on Submariner
   name: PEER_DNS_IP
   value: ""
+- description: Service export on Submariner 
+  displayName: Service exported on Submariner
+  name: SVC_EXPORT
+  value: ""
 
 objects:
 - apiVersion: v1
@@ -151,6 +155,7 @@ objects:
     database-user-password: ${DATABASE_USER_PASSWORD}
     keybase: ${SECRET_KEY_BASE}
     peer_dns_ip: ${PEER_DNS_IP}
+    svc_export: ${SVC_EXPORT}
 
 - apiVersion: v1
   kind: Service
@@ -229,6 +234,11 @@ objects:
                 secretKeyRef:
                   name: rails-mysql-persistent
                   key: peer_dns_ip
+            - name: SVC_EXPORT
+              valueFrom:
+                secretKeyRef:
+                  name: rails-mysql-persistent
+                  key: svc_export
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
